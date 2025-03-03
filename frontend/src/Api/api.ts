@@ -1,79 +1,73 @@
 import axios from 'axios';
 
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  description?: string;
-  imageUrl?: string;
-}
-
-interface FetchProductsParams {
-  page: number;
-  limit: number;
-  sort: string;
-  order: 'ASC' | 'DESC';
-  filters?: Record<string, string | number>;
-}
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export const api = axios.create({
-  baseURL: 'http://localhost:3000/products',
+  baseURL: `${API_BASE_URL}/products`,
 });
 
-export const fetchProducts = async ({
-  page,
-  limit,
-  sort,
-  order,
-  filters = {},
-}: FetchProductsParams): Promise<Product[]> => {
+interface Filters {
+  [key: string]: string | number | boolean;
+}
+
+export const fetchProducts = async (
+  page: number,
+  limit: number,
+  sort: string,
+  order: 'ASC' | 'DESC',
+  filters: Filters
+) => {
   try {
-    const params = { page, limit, sort, order, ...filters };
-    const { data } = await api.get<Product[]>('', { params });
+    const { data } = await api.get('', {
+      params: { page, limit, sort, order, ...filters },
+    });
     return data;
-  } catch (error: any) {
-    console.error('Error fetching products:', error.response?.data || error.message);
-    throw new Error('Failed to fetch products');
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    throw error;
   }
 };
 
-export const fetchProductById = async (id: number): Promise<Product> => {
+export const fetchProductById = async (id: string) => {
   try {
-    const { data } = await api.get<Product>(`/${id}`);
+    const { data } = await api.get(`/${id}`);
     return data;
-  } catch (error: any) {
-    console.error(`Error fetching product with ID ${id}:`, error.response?.data || error.message);
-    throw new Error('Failed to fetch product');
+  } catch (error) {
+    console.error(`Error fetching product with id ${id}:`, error);
+    throw error;
   }
 };
 
-export const createProduct = async (product: FormData): Promise<Product> => {
+export const createProduct = async (product: FormData) => {
   try {
-    const { data } = await api.post<Product>('', product, {
+    const { data } = await api.post('', product, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return data;
-  } catch (error: any) {
-    console.error('Error creating product:', error.response?.data || error.message);
-    throw new Error('Failed to create product');
+  } catch (error) {
+    console.error('Error creating product:', error);
+    throw error;
   }
 };
 
-export const updateProduct = async (id: number, productData: Partial<Product>): Promise<Product> => {
+export const updateProduct = async (id: string, productData: Record<string, any>) => {
   try {
-    const { data } = await api.put<Product>(`/${id}`, productData);
+    const { data } = await api.put(`/${id}`, productData, {
+      headers: { 'Content-Type': 'application/json' },
+    });
     return data;
-  } catch (error: any) {
-    console.error(`Error updating product with ID ${id}:`, error.response?.data || error.message);
-    throw new Error('Failed to update product');
+  } catch (error) {
+    console.error(`Error updating product with id ${id}:`, error);
+    throw error;
   }
 };
 
-export const deleteProduct = async (id: number): Promise<void> => {
+export const deleteProduct = async (id: number) => {
   try {
-    await api.delete(`/${id}`);
-  } catch (error: any) {
-    console.error(`Error deleting product with ID ${id}:`, error.response?.data || error.message);
-    throw new Error('Failed to delete product');
+    const { data } = await api.delete(`/${id}`);
+    return data;
+  } catch (error) {
+    console.error(`Error deleting product with id ${id}:`, error);
+    throw error;
   }
 };

@@ -3,7 +3,6 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-
 import { AppController } from './app.controller';
 import { ProductModule } from './product/product.module';
 import databaseConfig from './config/database.config';

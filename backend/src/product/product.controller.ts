@@ -10,7 +10,6 @@ import {
   UploadedFile,
   UseInterceptors,
   ParseIntPipe,
-  BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -19,40 +18,42 @@ import { extname } from 'path';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { FindProductsDto } from './dto/find-products.dto';
-
-const fileStorageConfig = () =>
-  diskStorage({
-    destination: './uploads',
-    filename: (req, file, callback) => {
-      const uniqueSuffix = uuidv4();
-      const fileExtName = extname(file.originalname);
-      callback(null, `${uniqueSuffix}${fileExtName}`);
-    },
-  });
 
 @Controller('products')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Post()
-  @UseInterceptors(FileInterceptor('photo', { storage: fileStorageConfig() }))
+  @UseInterceptors(
+    FileInterceptor('photo', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, callback) => {
+          const uniqueSuffix = uuidv4();
+          const fileExtName = extname(file.originalname);
+          callback(null, `${uniqueSuffix}${fileExtName}`);
+        },
+      }),
+    }),
+  )
   async create(
     @Body() createProductDto: CreateProductDto,
-    @UploadedFile() file?: Express.Multer.File,
+    @UploadedFile() file: Express.Multer.File,
   ) {
-    const photoPath = file?.filename;
+    const photoPath = file ? file.filename : undefined;
+    
     const sku = createProductDto.sku || `SKU-${uuidv4()}`;
-
+  
     try {
       return await this.productService.create({ ...createProductDto, sku }, photoPath);
     } catch (error) {
-      throw new BadRequestException('Товар не создался');
+      console.error('Ошибка при создании товара:', error);
+      throw new Error('Не удалось создать товар');
     }
   }
 
   @Get()
-  async findAll(@Query() query: FindProductsDto) {
+  async findAll(@Query() query: any) {
     return await this.productService.findAll(query);
   }
 
@@ -62,13 +63,24 @@ export class ProductController {
   }
 
   @Put(':id')
-  @UseInterceptors(FileInterceptor('photo', { storage: fileStorageConfig() }))
+  @UseInterceptors(
+    FileInterceptor('photo', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, callback) => {
+          const uniqueSuffix = uuidv4();
+          const fileExtName = extname(file.originalname);
+          callback(null, `${uniqueSuffix}${fileExtName}`);
+        },
+      }),
+    }),
+  )
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateProductDto: UpdateProductDto,
-    @UploadedFile() file?: Express.Multer.File,
+    @UploadedFile() file: Express.Multer.File,
   ) {
-    const photoPath = file?.filename;
+    const photoPath = file ? file.filename : undefined;
     return await this.productService.update(id, updateProductDto, photoPath);
   }
 
