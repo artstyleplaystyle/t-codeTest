@@ -14,6 +14,8 @@ import {
   Paper,
   Divider
 } from "@mui/material";
+import { globalStyles } from '../styles/global.styles';
+import { productDetailsStyles } from '../styles/ProductDetails.styles';
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -62,61 +64,40 @@ const ProductDetail: React.FC = () => {
   }
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
-      <Paper elevation={3} sx={{ borderRadius: 2, overflow: 'hidden' }}>
-        <Card sx={{ maxWidth: 500, m: 'auto' }}>
+    <Container maxWidth="sm" sx={productDetailsStyles.container}>
+      <Paper elevation={3} sx={productDetailsStyles.paper}>
+        <Card sx={productDetailsStyles.card}>
           <CardMedia
             component="img"
-            height="300"
             image={
               product.photo
                 ? `http://localhost:3000/uploads/${product.photo}`
                 : 'https://ybis.ru/wp-content/uploads/2023/09/solntse-kartinka-1.webp'
             }
             alt={product.name}
-            sx={{ 
-              objectFit: 'cover',
-              transition: 'transform 0.3s',
-              '&:hover': {
-                transform: 'scale(1.05)'
-              }
-            }}
+            sx={productDetailsStyles.cardMedia}
           />
-          <CardContent sx={{ p: 3 }}>
-            <Typography 
-              variant="h4" 
-              gutterBottom 
-              sx={{ fontWeight: 'bold', color: 'primary.main' }}
-            >
+          <CardContent sx={productDetailsStyles.content}>
+            <Typography variant="h4" gutterBottom sx={productDetailsStyles.title}>
               {product.name}
             </Typography>
             
-            <Typography 
-              color="text.secondary" 
-              paragraph 
-              sx={{ lineHeight: 1.6 }}
-            >
+            <Typography paragraph sx={productDetailsStyles.description}>
               {product.description}
             </Typography>
             
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-              <Typography variant="h6" sx={{ fontWeight: 'medium' }}>
+            <Box sx={productDetailsStyles.priceContainer}>
+              <Typography variant="h6" sx={productDetailsStyles.price}>
                 Цена: {product.price} ₽
               </Typography>
               {product.discountPrice && (
-                <Typography 
-                  variant="body2" 
-                  sx={{ 
-                    color: 'success.main',
-                    fontWeight: 'medium'
-                  }}
-                >
+                <Typography variant="body2" sx={productDetailsStyles.discount}>
                   Скидка: {product.discountPrice}%
                 </Typography>
               )}
             </Box>
 
-            <Divider sx={{ mb: 3 }} />
+            <Divider sx={productDetailsStyles.divider} />
 
             <Box 
               display="flex" 

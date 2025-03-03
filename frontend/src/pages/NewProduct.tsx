@@ -10,6 +10,7 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { createProduct } from '../Api/api';
+import { styles } from '../styles/NewProduct.styles';
 
 const CreateProduct = () => {
   const [productData, setProductData] = useState({
@@ -56,18 +57,18 @@ const CreateProduct = () => {
   };
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
-      <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
+    <Container maxWidth="sm" sx={styles.container}>
+      <Paper elevation={3} sx={styles.paper}>
         <Typography 
           variant="h4" 
           align="center" 
           gutterBottom
-          sx={{ mb: 4, fontWeight: 'bold', color: 'primary.main' }}
+          sx={styles.title}
         >
           Создать новый товар
         </Typography>
         
-        <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <Box component="form" onSubmit={handleSubmit} sx={styles.form}>
           <TextField
             label="Название товара"
             name="name"
@@ -122,19 +123,13 @@ const CreateProduct = () => {
             <Typography variant="subtitle2" gutterBottom>
               Фотография товара
             </Typography>
-            <input 
-              type="file" 
-              accept="image/*" 
-              onChange={handleFileChange}
-              style={{
-                display: 'block',
-                width: '100%',
-                padding: '10px',
-                border: '1px solid #ced4da',
-                borderRadius: '4px',
-                backgroundColor: '#fff'
-              }}
-            />
+            <Box sx={styles.fileInput}>
+              <input 
+                type="file" 
+                accept="image/*" 
+                onChange={handleFileChange}
+              />
+            </Box>
           </Box>
 
           <Button
@@ -142,15 +137,7 @@ const CreateProduct = () => {
             color="primary"
             type="submit"
             size="large"
-            sx={{ 
-              mt: 2,
-              py: 1.5,
-              fontWeight: 'bold',
-              '&:hover': {
-                transform: 'translateY(-1px)',
-                boxShadow: 4
-              }
-            }}
+            sx={styles.submitButton}
           >
             Создать товар
           </Button>
@@ -161,3 +148,4 @@ const CreateProduct = () => {
 };
 
 export default CreateProduct;
+

@@ -6,8 +6,37 @@ export const api = axios.create({
   baseURL: `${API_BASE_URL}/products`,
 });
 
-interface Filters {
-  [key: string]: string | number | boolean;
+export interface Product {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  photo?: string;
+  discount: number;
+  sku: string;
+}
+
+export interface ProductFormData {
+  name: string;
+  description: string;
+  price: number;
+  photo?: File;
+  discount?: number;
+  sku?: string;
+}
+
+export interface ProductFilters {
+  minPrice?: number;
+  maxPrice?: number;
+  name?: string;
+  [key: string]: string | number | undefined;
+}
+
+export interface ProductsResponse {
+  data: Product[];
+  total: number;
+  page: number;
+  limit: number;
 }
 
 export const fetchProducts = async (
@@ -15,10 +44,10 @@ export const fetchProducts = async (
   limit: number,
   sort: string,
   order: 'ASC' | 'DESC',
-  filters: Filters
-) => {
+  filters: ProductFilters
+): Promise<ProductsResponse> => {
   try {
-    const { data } = await api.get('', {
+    const { data } = await api.get<ProductsResponse>('', {
       params: { page, limit, sort, order, ...filters },
     });
     return data;
@@ -28,9 +57,9 @@ export const fetchProducts = async (
   }
 };
 
-export const fetchProductById = async (id: string) => {
+export const fetchProductById = async (id: string): Promise<Product> => {
   try {
-    const { data } = await api.get(`/${id}`);
+    const { data } = await api.get<Product>(`/${id}`);
     return data;
   } catch (error) {
     console.error(`Error fetching product with id ${id}:`, error);
@@ -38,9 +67,9 @@ export const fetchProductById = async (id: string) => {
   }
 };
 
-export const createProduct = async (product: FormData) => {
+export const createProduct = async (product: FormData): Promise<Product> => {
   try {
-    const { data } = await api.post('', product, {
+    const { data } = await api.post<Product>('', product, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return data;
@@ -50,9 +79,9 @@ export const createProduct = async (product: FormData) => {
   }
 };
 
-export const updateProduct = async (id: string, productData: Record<string, any>) => {
+export const updateProduct = async (id: string, productData: Partial<ProductFormData>): Promise<Product> => {
   try {
-    const { data } = await api.put(`/${id}`, productData, {
+    const { data } = await api.put<Product>(`/${id}`, productData, {
       headers: { 'Content-Type': 'application/json' },
     });
     return data;
@@ -62,10 +91,9 @@ export const updateProduct = async (id: string, productData: Record<string, any>
   }
 };
 
-export const deleteProduct = async (id: number) => {
+export const deleteProduct = async (id: number): Promise<void> => {
   try {
-    const { data } = await api.delete(`/${id}`);
-    return data;
+    await api.delete(`/${id}`);
   } catch (error) {
     console.error(`Error deleting product with id ${id}:`, error);
     throw error;
