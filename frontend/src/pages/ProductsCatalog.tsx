@@ -21,7 +21,7 @@ import { Product } from '../index';
 const ProductsCatalog = () => {
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
-  const [sort, setSort] = useState('name');
+  const [sortBy, setSort] = useState('createdAt');
   const [order, setOrder] = useState<'ASC' | 'DESC'>('ASC');
   const [filters, setFilters] = useState<any>({
     name: '',
@@ -30,8 +30,8 @@ const ProductsCatalog = () => {
   });
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['products', page, limit, sort, order, filters],
-    queryFn: () => fetchProducts(page, limit, sort, order, filters),
+    queryKey: ['products', page, limit, sortBy, order, filters],
+    queryFn: () => fetchProducts(page, limit, sortBy, order, filters),
   });
 
   const totalPages = Math.ceil((data?.total || 0) / limit);
@@ -171,13 +171,14 @@ const ProductsCatalog = () => {
             <FormControl fullWidth variant="outlined">
               <InputLabel>Сортировка</InputLabel>
               <Select 
-                value={sort} 
+                value={sortBy} 
                 onChange={handleSortChange}
                 label="Сортировка"
                 sx={{ borderRadius: 2, backgroundColor: 'white' }}
               >
-                <MenuItem value="name">По названию</MenuItem>
                 <MenuItem value="price">По цене</MenuItem>
+                <MenuItem value="discount">По скидке</MenuItem>
+                <MenuItem value="createdAt">По дате добавления</MenuItem>
               </Select>
             </FormControl>
           </Grid>
